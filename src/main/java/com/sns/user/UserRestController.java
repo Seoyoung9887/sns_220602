@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +55,25 @@ public class UserRestController {
 		Map<String, Object> result = new HashMap<>();
 		result.put("result", "success");
 		return result;
+	}
+	@PostMapping("/sign_in")
+	public Map<String,Object> signIn(
+			@RequestParam("loginId")String loginId,
+			@RequestParam("password")String password,
+			HttpSession session){
+		String encryptPassword = EncryptUtils.md5(password);
+		User user =userBO.getUserByLoginIdPassword(loginId,encryptPassword);
+		Map<String, Object> result = new HashMap<>();
+		if(user != null) {
+			session.setAttribute("userId", user.getId());
+			session.setAttribute("userLoginId", user.getLoginId());
+			session.setAttribute("userName", user.getName());
+			result.put("result","success");
+		}else {
+			result.put("errorMessage","존재하지 않음");
+		}
+		return result;
+		
 	}
 
 
