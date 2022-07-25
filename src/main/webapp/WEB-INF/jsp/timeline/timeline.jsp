@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="d-flex justify-content-center">
 	<div class="contents-box">
 		<%-- 글쓰기 영역 --%>
@@ -18,8 +19,69 @@
 					<div id="fileName" class="ml-2">
 					</div>
 				</div>
-				<button type="button" class="btn btn-info">게시</button>
+				<button type="button" id="writeBtn" class="btn btn-info">게시</button>
 			</div>
+		</div>
+		
+		<%-- 타임라인 영역 --%>
+		<div class="timeline-box my-5">
+			<%-- 카드 마다 영역을 border로 나눔 --%>
+			<c:forEach var="post" items="${postList}">
+			<div class="card border rounded mt-3">
+				<%-- 글쓴이 아이디, 삭제를 위한 ...버튼 : 이 둘을 한 행에 멀리 떨어뜨려 나타내기 위해 d-flex, between --%>
+				<div class="p-2 d-flex justify-content-between">
+					<span class="font-weight-bold">글쓴이</span>
+					
+					<%-- 삭제 모달을 뛰우기 위한 ... 버튼 --%>
+					<a href="#" class="more-btn">
+						<img src="https://www.iconninja.com/files/860/824/939/more-icon.png" width="30">
+					</a>
+				</div>
+				
+				<%-- 카드 이미지 --%>
+				<div class="card-img">
+					<img src="${post.imagPath}" class="w-100" alt="이미지">
+				</div>
+				
+				<%-- 좋아요 --%>
+				<div class="card-like m-3">
+					<a href="#" class="like-btn">
+						<img src="https://www.iconninja.com/files/214/518/441/heart-icon.png" width="18px" height="18px" alt="empty heart">
+						좋아요 11개
+					</a>
+				</div>
+				
+				<%-- 글(post) --%>
+				<div class="card-post m-3">
+					<span class="font-weight-bold">글쓴이</span>
+					<span>글 내용</span>
+				</div>
+				
+				<%-- 댓글(comment) --%>
+				<div class="card-comment-desc border-bottom">
+					<div class="ml-3 mb-1 font-weight-bold">댓글</div>
+				</div>
+				<div class="card-comment-list m-2">
+					<%-- 댓글 목록 --%>
+					<div class="card-comment m-1">
+						<span class="font-weight-bold">댓글쓰니 : </span>
+						<span>댓글 내용</span>
+						
+						<%-- 댓글 삭제 --%>
+						<a href="#" class="commentDelBtn" data-comment-id="${commentView.comment.id}">
+							<img src="https://www.iconninja.com/files/603/22/506/x-icon.png" width="10px" height="10px">
+						</a>
+					</div>
+				</div>
+				
+				<%-- 댓글 쓰기 --%>
+				<div class="comment-write d-flex boder-top">
+				      <input type = "text" class="form-control border-0" placeholder="댓글달기">
+				      <button type="button" class="comment-btn btn btn-light" data-post-id="${post.id}">게시</button>
+				
+				</div>
+			</div>
+			</c:forEach>
 		</div>
 	</div>
 </div>
@@ -54,17 +116,58 @@ $(document).ready(function() {
 		// 임시파일 명 노출
 		$('#fileName').text(fileName);
 	});
+	
+	$('#writeBtn').on('click', function() {
+		// validation 
+		let content = $('#writeTextArea').val();
+		console.log(content);
+		if (content.length < 1) {
+			alert("글 내용을 입력해주세요");
+		}
+		
+		// 파일이 업로드 된 경우 확장자 체크
+		let file = $('#file').val();  // 파일 경로만 가져온다.
+		console.log(file);  // C:\fakepath\image.png
+		if (file != '') {
+			let ext = file.split('.').pop().toLowerCase(); // 파일 경로를 .으로 나누고 확장자가 있는 마지막 문자열을 가져온 후 모두 소문자로 변경
+			if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+				alert("gif, png, jpg, jpeg 파일만 업로드 할 수 있습니다.");
+				$('#file').val(''); // 파일을 비운다.
+				return;
+			}
+		}
+		
+		// 폼태그를 자바스크립트에서 만든다.
+		let formData = new FormData();
+		formData.append("content", content);
+		formData.append("file", $('#file')[0].files[0]); // $('#file')[0]은 첫번째 input file 태그를 의미, files[0]는 업로드된 첫번째 파일
+		
+		// AJAX form 데이터 전송
+		$.ajax({
+			type: "post"
+			, url: "/post/create"
+			, data: formData
+			, enctype: "multipart/form-data"    // 파일 업로드를 위한 필수 설정
+			, processData: false    // 파일 업로드를 위한 필수 설정
+			, contentType: false    // 파일 업로드를 위한 필수 설정
+			, success: function(data) {
+				if (data.result == "success") {
+					location.reload();
+				} else {
+					alert(data.errorMessage);
+				}
+			}
+			, error: function(e) {
+				alert("메모 저장에 실패했습니다. 관리자에게 문의해주세요.");
+			}
+		});
+	});
+	//댓글 게시 버튼 클릭
+	$('.comment-btn').on('click', function(e){
+		let postId = $(this).data('post-id');
+		let content = $(this).siblings("input").val().trim();
+		alert(content);
+	});
 });
 </script>
-
-
-
-
-
-
-
-
-
-
-
 
