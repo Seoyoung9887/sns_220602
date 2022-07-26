@@ -26,11 +26,11 @@
 		<%-- 타임라인 영역 --%>
 		<div class="timeline-box my-5">
 			<%-- 카드 마다 영역을 border로 나눔 --%>
-			<c:forEach var="post" items="${postList}">
+			<c:forEach var="card" items="${cardViewList}">
 			<div class="card border rounded mt-3">
 				<%-- 글쓴이 아이디, 삭제를 위한 ...버튼 : 이 둘을 한 행에 멀리 떨어뜨려 나타내기 위해 d-flex, between --%>
 				<div class="p-2 d-flex justify-content-between">
-					<span class="font-weight-bold">글쓴이</span>
+					<span class="font-weight-bold">${card.user.name}</span>
 					
 					<%-- 삭제 모달을 뛰우기 위한 ... 버튼 --%>
 					<a href="#" class="more-btn">
@@ -40,7 +40,7 @@
 				
 				<%-- 카드 이미지 --%>
 				<div class="card-img">
-					<img src="${post.imagPath}" class="w-100" alt="이미지">
+					<img src="${card.post.imagPath}" class="w-100" alt="이미지">
 				</div>
 				
 				<%-- 좋아요 --%>
@@ -54,7 +54,7 @@
 				<%-- 글(post) --%>
 				<div class="card-post m-3">
 					<span class="font-weight-bold">글쓴이</span>
-					<span>글 내용</span>
+					<span>${card.post.content}</span>
 				</div>
 				
 				<%-- 댓글(comment) --%>
@@ -75,11 +75,13 @@
 				</div>
 				
 				<%-- 댓글 쓰기 --%>
+				<c:if test="${not empty userId}">
 				<div class="comment-write d-flex boder-top">
 				      <input type = "text" class="form-control border-0" placeholder="댓글달기">
-				      <button type="button" class="comment-btn btn btn-light" data-post-id="${post.id}">게시</button>
+				      <button type="button" class="comment-btn btn btn-light" data-post-id="${card.post.id}">게시</button>
 				
 				</div>
+				</c:if>
 			</div>
 			</c:forEach>
 		</div>
@@ -166,7 +168,31 @@ $(document).ready(function() {
 	$('.comment-btn').on('click', function(e){
 		let postId = $(this).data('post-id');
 		let content = $(this).siblings("input").val().trim();
-		alert(content);
+		
+		
+		if(content.length < 1){
+			alert("댓글 내용을 입력해주세요");
+			return;
+		}
+		$.ajax({
+			type:"post"
+			,url:"/comment/create"
+			,data:{"postId": postId, "content":content}
+		    
+		//response
+		    , success: function(data){
+		    	if(data.result == "success"){
+		    		location.reload(true); // 댓글 쓰고 나서 새로고침
+		    	}else{
+		    		alert(data.errorMessage);
+		    	}
+		    }
+		    ,error: function(e){
+		    	alert("통신에 실패했습니다")
+		    }
+		});
+		
+		
 	});
 });
 </script>

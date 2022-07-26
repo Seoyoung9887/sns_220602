@@ -1,5 +1,6 @@
 package com.sns.timeline;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,20 +10,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.sns.post.bo.PostBO;
 import com.sns.post.model.Post;
+import com.sns.timeline.bo.TimelineBO;
+import com.sns.timeline.model.CardView;
 
 @RequestMapping("/timeline")
 @Controller
 public class TimelineController {
 	
+//	@Autowired
+//	private PostBO postBO;
 	@Autowired
-	private PostBO postBO;
+	private TimelineBO timelineBO;
 	
 	@RequestMapping("/timeline_view")
 	public String timelineView(Model model) {
-		List<Post> postList = postBO.getPostList();
+		List<CardView> cardViewList = timelineBO.generateCardViewList();
+		model.addAttribute("cardViewList", cardViewList);
 		
-		model.addAttribute("postList", postList);
-		model.addAttribute("viewName", "timeline/timeline");
+//		List<Post> postList = postBO.getPostList();
+		
+//		model.addAttribute("postList", postList);
+//		model.addAttribute("viewName", "timeline/timeline");
 		return "template/layout";
 	}
 }
