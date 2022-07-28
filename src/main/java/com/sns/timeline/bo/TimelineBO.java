@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.sns.comment.bo.CommentBO;
 import com.sns.comment.model.Comment;
+import com.sns.comment.model.CommentView;
 import com.sns.post.bo.PostBO;
 import com.sns.post.model.Post;
 import com.sns.timeline.model.CardView;
@@ -27,7 +28,7 @@ public class TimelineBO {
 	@Autowired
 	private CommentBO commentBO;
 	
-	public List<CardView> generateCardViewList(){
+	public List<CardView> generateCardViewList(Integer userId){
 		// List<CardView> 
 		List<CardView> cardViewList = new ArrayList<>();
 		//글 목록을 가져온다
@@ -46,10 +47,19 @@ public class TimelineBO {
 			//1:N 글:댓글 댓글들 정보
 			int postId = post.getId(); //글번호
 			//List<comment> -> List<CommentView>=> comment 패키지에서
-			List<Comment> commentList = commentBO.getCommentListByPostId(postId);
+			List<CommentView> commentList = commentBO.generateCommentViewListByPostId(postId);
 			card.setCommentList(commentList);
+			
+			//내가 좋아요 한지 여부
+			card.setFilledLike(false);
+			
+				//likeBO
+			
+			//글에 대한 좋아요 개수
+			
 			//결과 리스트에 카드 저장
-			cardViewList.add(card);
+			cardViewList.add(card);	
+			
 			
 		}
 		

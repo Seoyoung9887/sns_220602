@@ -53,7 +53,7 @@
 				
 				<%-- 글(post) --%>
 				<div class="card-post m-3">
-					<span class="font-weight-bold">글쓴이</span>
+					<span class="font-weight-bold">${card.user.name}</span>
 					<span>${card.post.content}</span>
 				</div>
 				
@@ -65,7 +65,7 @@
 					<%-- 댓글 목록 --%>
 					<div class="card-comment m-1">
 						<span class="font-weight-bold">댓글쓰니 : </span>
-						<span>댓글 내용</span>
+						<span>${commentView.comment.content}</span>
 						
 						<%-- 댓글 삭제 --%>
 						<a href="#" class="commentDelBtn" data-comment-id="${commentView.comment.id}">
