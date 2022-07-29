@@ -33,9 +33,11 @@
 					<span class="font-weight-bold">${card.user.name}</span>
 					
 					<%-- 삭제 모달을 뛰우기 위한 ... 버튼 --%>
-					<a href="#" class="more-btn">
+					<c:if test="${card.user.id eq userId}">
+					<a href="#" class="more-btn" data-toggle="modal" data-target="#moreModal" data-post-id="${card.post.id}">
 						<img src="https://www.iconninja.com/files/860/824/939/more-icon.png" width="30">
 					</a>
+					</c:if>
 				</div>
 				
 				<%-- 카드 이미지 --%>
@@ -63,15 +65,20 @@
 				</div>
 				<div class="card-comment-list m-2">
 					<%-- 댓글 목록 --%>
+					<c:forEach var="comment" items="${card.commentList}">
 					<div class="card-comment m-1">
-						<span class="font-weight-bold">댓글쓰니 : </span>
-						<span>${commentView.comment.content}</span>
+						<span class="font-weight-bold">${comment.user.name} : </span>
+						<span>${comment.comment.content}</span>
 						
 						<%-- 댓글 삭제 --%>
-						<a href="#" class="commentDelBtn" data-comment-id="${commentView.comment.id}">
+						<c:if test="${comment.user.id eq userId}">
+						<a href="#" class="commentDelBtn" data-comment-id="${comment.comment.id}">
 							<img src="https://www.iconninja.com/files/603/22/506/x-icon.png" width="10px" height="10px">
 						</a>
+						</c:if>
+						
 					</div>
+					</c:forEach>
 				</div>
 				
 				<%-- 댓글 쓰기 --%>
@@ -87,6 +94,34 @@
 		</div>
 	</div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="moreModal">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+       	<%-- modal 창 안에 내용 넣기 --%>
+       	<div class="text-center py-3 ">
+       	<%--d-block: 클릭할 수 있는 영역을 넓히기 위해 --%>
+       		<a href="#" class="del-post d-block">삭제하기</a>
+       	</div>
+       	<div class="text-center py-3 border-top ">
+       	    <%--data-dismiss: 모달창 닫힘 --%>
+       	    <a href="#" class="d-block" data-dismiss="modal">취소</a>
+       	</div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
 
 <script>
 $(document).ready(function() {
@@ -193,6 +228,62 @@ $(document).ready(function() {
 		});
 		
 		
+	});
+	
+	//... 더보기 버튼 클릭시, 모달에 삭제될 글 번호를 넣어준다.
+	$('.more-btn').on('click',function(e){
+		e.preventDefault(); //a 태그 기본 동작 중단(위로 올라가는거 중단)
+		let postId = $(this).data('post-id'); //get
+		
+		
+		//모달에 삭제될 글 번호를 넣어준다.(모달에 재활용 되기 떄문에)
+		$('#moreModal').data('post-id',postId); //set  태그: data-post-id="2"
+	});
+	//모달창 안에 있는 삭제하기 번튼 클릭
+	$("#moreModal .del-post").on('click',function(e){
+		e.preventDefault(); //a 태그 기본 동작 중단(위로 올라가는거 중단)
+		let postId = $('#moreModal').data('post-id');
+		alert(postId);
+		
+		//서버에 삭제 요청
+		$.ajax({
+			type:"delete"
+			,url:"/post/delete"
+			,data:{"postId":postId}
+		
+		    ,success:function(data){
+		    	if(data.result == "success"){
+		    		location.reload(true);//새로고침
+		    	}else{
+		    	alert(data.errorMessage)
+		        }
+		    }
+		    ,error:function(e){
+		    	alert("삭제하는데 실패했습니다. 관리자에세 문의 주세요")
+		    }
+		});
+		
+	});
+	$('.commentDelBtn').on('click', function(e){
+		e.preventDefault();
+		let commentId = $(this).data('comment-id');
+		
+		$.ajax({
+			type:"delete"
+			,url:"/comment/delete"
+			,data:{"id":commentId}
+		    
+		    ,success:function(data){
+		    	if(data.result == "success"){
+		    		location.reload(true);
+		    	}else{
+		    		alert(data.errorMessage)
+		    	}
+		    }
+		    ,error:function(){
+		    	alert("삭제하는데 실패했습니다. 관리자에세 문의 주세요")
+		    }
+		});
 	});
 });
 </script>

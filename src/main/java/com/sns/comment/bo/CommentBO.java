@@ -54,5 +54,8 @@ public class CommentBO {
 		
 		
 	}
+	public void deleteComment(int id) {
+		commentDAO.deleteComment(id);
+	}
 
 }
