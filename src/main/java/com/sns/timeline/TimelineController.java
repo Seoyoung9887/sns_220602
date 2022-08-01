@@ -19,19 +19,19 @@ import com.sns.timeline.model.CardView;
 @Controller
 public class TimelineController {
 	
-//	@Autowired
-//	private PostBO postBO;
 	@Autowired
 	private TimelineBO timelineBO;
 	
 	@RequestMapping("/timeline_view")
 	public String timelineView(Model model, HttpSession session) {
-		List<CardView> cardViewList = timelineBO.generateCardViewList((Integer)session.getAttribute("userId"));
+		List<CardView> cardViewList = timelineBO.generateCardViewList((Integer) session.getAttribute("userId"));
 		model.addAttribute("cardViewList", cardViewList);
 		
-//		List<Post> postList = postBO.getPostList();
+		//List<Post> postList = postBO.getPostList();
+		//model.addAttribute("postList", postList);
+		//model.addAttribute("commentList", commentList);
 		
-//		model.addAttribute("postList", postList);
+		
 		model.addAttribute("viewName", "timeline/timeline");
 		return "template/layout";
 	}

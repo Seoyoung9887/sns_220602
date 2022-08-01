@@ -34,4 +34,26 @@
 			`post`
 		ORDER BY `id` DESC
 	</select>
+	<delete id="deletePostByPostIdUserId" parameterType="map">
+		DELETE
+		FROM	
+			`post`
+		WHERE
+			`id` = #{postId}
+			AND `userid` = #{userId}
+	</delete>
+	<select id="selectPostByPostIdUserId" parameterType="map" resultType="com.sns.post.model.Post">
+		SELECT
+			`id`
+			,`userid`
+			,`content`
+			,`imagPath`
+			,`createdAt`
+			,`updatedAt`
+		FROM
+			`post`
+		WHERE
+			`id` = #{postId}
+			AND `userid` = #{userId}
+	</select>
 </mapper>

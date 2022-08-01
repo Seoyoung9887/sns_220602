@@ -10,7 +10,7 @@ public interface LikeDAO {
 
 	public boolean existLikeByPostIdAndUserId(
 			@Param("postId") int postId,
-			@Param("userId") int userId);
+			@Param("userId") Integer userId);
 	
 	public void insertLike(
 			@Param("postId") int postId,
@@ -23,4 +23,7 @@ public interface LikeDAO {
 	public Like selectLikeByPostIdAndUserId(
 			@Param("postId") int postId,
 			@Param("userId") int userId);
+	
+	public int selectLikeCountByPostId(int postId);
+	public void deleteLikeByPostId(int postId);
 }

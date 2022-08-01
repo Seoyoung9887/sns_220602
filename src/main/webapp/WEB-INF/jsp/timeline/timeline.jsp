@@ -47,9 +47,17 @@
 				
 				<%-- 좋아요 --%>
 				<div class="card-like m-3">
-					<a href="#" class="like-btn">
-						<img src="https://www.iconninja.com/files/214/518/441/heart-icon.png" width="18px" height="18px" alt="empty heart">
-						좋아요 11개
+					<a href="#" class="like-btn" data-post-id="${card.post.id}" data-user-id="${userId}">
+						<%-- 좋아요 눌렸을 때 --%>
+						<c:if test="${card.filledLike}">
+							<img src="https://www.iconninja.com/files/527/809/128/heart-icon.png" width="18px" height="18px" alt="filled heart">
+						</c:if>
+						<%-- 좋아요 해제 시 --%>
+						<c:if test="${card.filledLike == false}">
+							<img src="https://www.iconninja.com/files/214/518/441/heart-icon.png" width="18px" height="18px" alt="empty heart">
+						</c:if>
+						
+						좋아요 ${card.likeCount}개
 					</a>
 				</div>
 				
@@ -229,6 +237,32 @@ $(document).ready(function() {
 		
 		
 	});
+	// 좋아요 클릭
+	$('.like-btn').on('click', function(e) {
+		e.preventDefault(); // a 태그 위로 가는 기능 중단
+		
+		// 로그인 여부 체크
+		let userId = $(this).data('user-id');
+		if (userId.length < 1) {
+			alert("로그인 된 사용자만 사용 가능합니다.");
+			return;
+		}
+		
+		let postId = $(this).data('post-id');
+		
+		$.ajax({
+			url:"/like/" + postId
+			, data: {"postId":postId}
+			, success:function(data) {
+				if (data.result == "success") {
+					location.reload(true); // 새로고침
+				}
+			}
+			, error: function(e) {
+				alert("좋아요 실패");
+			}
+		});
+	});
 	
 	//... 더보기 버튼 클릭시, 모달에 삭제될 글 번호를 넣어준다.
 	$('.more-btn').on('click',function(e){
@@ -243,7 +277,7 @@ $(document).ready(function() {
 	$("#moreModal .del-post").on('click',function(e){
 		e.preventDefault(); //a 태그 기본 동작 중단(위로 올라가는거 중단)
 		let postId = $('#moreModal').data('post-id');
-		alert(postId);
+		//alert(postId);
 		
 		//서버에 삭제 요청
 		$.ajax({
