@@ -279,7 +279,7 @@ $(document).ready(function() {
 		let postId = $('#moreModal').data('post-id');
 		//alert(postId);
 		
-		//서버에 삭제 요청
+		//서버에 삭제 요청 !!!!
 		$.ajax({
 			type:"delete"
 			,url:"/post/delete"
